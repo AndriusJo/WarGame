@@ -5,3 +5,18 @@ object CardParts {
   val suits = List("Spades", "Hearts", "Diamonds", "Clubs")
   val ranks = List(("Two", 2) ,("Three", 3),("Four", 4),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
 }
+
+object CardPartsTest {
+  val suits = List("Spades", "Hearts", "Diamonds")
+  val ranks = List(("Two", 2) ,("Three", 3),("Four", 4),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
+}
+
+object CardPartsTest2 {
+  val suits = List("Spades")
+  val ranks = List(("Two", 2))
+}
+
+object CardPartsTest3 {
+  val suits = List("Spades", "Hearts", "Diamonds", "Clubs")
+  val ranks = List(("Two", 2) ,("Two", 2),("Two", 2),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
+}

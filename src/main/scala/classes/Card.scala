@@ -3,7 +3,7 @@ import scala.util._
 import scala.collection.mutable.Queue
 
 class Card(private var suit: String,private var rank:(String, Int)){
-  var value = if(CardParts.ranks.contains(rank)) rank._2 else 0
+  var value = if(CardParts.ranks.contains(rank) && rank._2 >= 0) rank._2 else 0
 
   def getSuit() : String = suit
   def getRank() : String = rank._1

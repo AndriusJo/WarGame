@@ -2,11 +2,13 @@ import scala.compiletime.ops.int
 import scala.util._
 import scala.collection.mutable.Queue
 
-//On first call creates a base deck of 52 cards, by multiplying all the suites with all the ranks (held in CardParts.scala)
 class Deck(pCards: List[Card]){
   //Throws an exception if the deck is smaller than 52 cards or there are duplicates
-  val cards = if (isValidDeck(pCards)) pCards
-  else throw new RuntimeException("Deck is invalid!")
+  val cards = CheckDeck(pCards) match {
+    case ValidDeck(message) => pCards
+    case InvalidDeck(message) => List.empty[Card]
+    case _ => List.empty[Card]
+  }
 
   var deckTrumpSuit:Option[String] = None
   def getTrumpSuit() = deckTrumpSuit.getOrElse("None")
@@ -25,6 +27,5 @@ class Deck(pCards: List[Card]){
 
   //Splits the deck in half
   def Split() = cards.splitAt(cards.length/2.toInt)
-    
-  private def isValidDeck(cards: List[Card]) = cards.size <= 52 && cards.size >=2 && cards.distinct.size == cards.size
 }
+
