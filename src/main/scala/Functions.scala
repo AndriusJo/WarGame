@@ -2,84 +2,60 @@ import scala.compiletime.ops.int
 import scala.util._
 import scala.collection.mutable.Queue
 
-def CreateDeck(suits: List[String] = CardParts.suits, ranks: List[(String, Int)] = CardParts.ranks) = {
-  new Deck(for (s <- suits; r <- ranks) yield Card(s, r))
+def createDeck(newDeck: List[Card] = (for (s <- Suit.values; r <- Rank.values) yield Card(s, r)).toList) = {
+  new Deck(newDeck)
 }
 
+def playWar(player1Cards: List[Card], player2Cards: List[Card], trumpSuit: Suit): (List[Card], List[Card]) = {
+  //Crate score piles for each palyer
+  val player1ScorePile:Queue[Card] = new Queue[Card]
+  val player2ScorePile:Queue[Card] = new Queue[Card]
 
+  val Rounds = if (player1Cards.length <= player2Cards.length) player1Cards.length else player2Cards.length
+  //Fill score piles 
+  for(Round <- 0 to Rounds - 1){
+    val P1:Int = setValue(player1Cards(Round), trumpSuit)
+    val P2:Int = setValue(player2Cards(Round), trumpSuit)
 
-def CheckDeck(pDeck:List[Card]): GameState = pDeck match {
-  case pDeck if(pDeck.size <= 52 && pDeck.size >=2 && NoDuplicates(pDeck)) =>
-    ValidDeck("Deck created succesfully!")
-
-  case _ => InvalidDeck("Deck has an improper number of cards or contains duplicates")
-}
-
-def NoDuplicates(pDeck:List[Card]): Boolean = {
-  pDeck.groupBy(obj => (obj.getRank(), obj.getSuit())).values.map(_.head).toList.size == pDeck.size
-}
-
-def CheckHandEquality(hand1: List[Card], hand2: List[Card]): GameState = (hand1, hand2) match {
-  case equal if(hand1.length == hand2.length) =>
-    EqualHands("Player hands are equal")
-
-  case _ => UneaqualHands("Player hands are not equal")
-}
-
-def PlayWar(Player1Cards: List[Card], Player2Cards: List[Card]): Either[String, (List[Card], List[Card])] = {
-  CheckHandEquality(Player1Cards, Player2Cards) match {
-    case EqualHands(newmessage) => {
-        //Crate score piles for each palyer
-      val Player1ScorePile:Queue[Card] = new Queue[Card]
-      val Player2ScorePile:Queue[Card] = new Queue[Card]
-
-        //Fill score piles 
-      for(Round <- 0 to Player1Cards.length - 1){
-        val P1:Int = Player1Cards(Round).value
-        val P2:Int = Player2Cards(Round).value
-
-        if(P1 > P2){
-          Player1ScorePile.addOne(Player1Cards(Round))
-          Player1ScorePile.addOne(Player2Cards(Round))
-        }
-        else if(P1 < P2){
-          Player2ScorePile.addOne(Player1Cards(Round))
-          Player2ScorePile.addOne(Player2Cards(Round))
-        }
-        else{
-          Player1ScorePile.addOne(Player1Cards(Round))
-          Player2ScorePile.addOne(Player2Cards(Round))
-        }
-      }
-      Right((Player1ScorePile.toList, Player2ScorePile.toList))
+    if(P1 > P2){
+      player1ScorePile.enqueue(player1Cards(Round), player2Cards(Round))
     }
-    case UneaqualHands(message) => Left(message)
-    case _ => Left("Error in PlayWar")
-  } 
+    else if(P1 < P2){
+      player2ScorePile.enqueue(player1Cards(Round), player2Cards(Round))
+    }
+    else{
+      player1ScorePile.addOne(player1Cards(Round))
+      player2ScorePile.addOne(player2Cards(Round))
+    }
+  }
+  (player1ScorePile.toList, player2ScorePile.toList)
+}
+
+def setValue(card: Card, trumpSuit: Suit): Int = {
+  if(card.getSuit() == trumpSuit)
+    card.getRank().value + 20
+  else
+    card.getRank().value
 }
 
 //Function just to output the results
-def PrintOutputs(PlayerDecks: (List[Card], List[Card]), GameResults: (List[Card], List[Card])) = {
-  println("-----Player1--------------")
-  for (element <- PlayerDecks._1){
-    println(element.getRank() +" "+ element.getSuit() +" "+ element.getValue())
+def printOutputs(playerDecks: (List[Card], List[Card]), gameResults: (List[Card], List[Card]), trumpSuit: Suit) = {  
+  println(s"Trump suit: ${trumpSuit}")
+  println("---------------Player One Cards----------------")
+  printCards(playerDecks._1)
+  println("---------------Player Two Cards----------------")
+  printCards(playerDecks._2)
+  println("-------------Player One Score Pile-------------")
+  printCards(gameResults._1)
+  println("-------------Player Two Score Pile-------------")
+  printCards(gameResults._2)
+  
+  println(s"Player 1 score: ${gameResults._1.length}")
+  println(s"Player 2 score: ${gameResults._2.length}")
+}
+
+def printCards(cards: List[Card]) = {
+  for (card <- cards){
+    card.prettyPrint()
   }
-
-  println("-----Player2--------------")
-  for (element <- PlayerDecks._2){
-    println(element.getRank() +" "+ element.getSuit() +" "+ element.getValue())
-  }
-
-  println("-----Player1Result--------------")
-  for (element <- GameResults._1){
-    println(element.getRank() +" "+ element.getSuit() +" "+ element.getValue())
-   }
-
-  println("-----Player2Result--------------") 
-  for (element <- GameResults._2){
-    println(element.getRank() +" "+ element.getSuit() +" "+ element.getValue())
-  }
-
-  println(s"Player 1 score: ${GameResults._1.length}")
-  println(s"Player 2 score: ${GameResults._2.length}")
 }

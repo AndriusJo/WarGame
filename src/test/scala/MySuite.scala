@@ -1,60 +1,48 @@
-// For more information on writing tests, see
-// https://scalameta.org/munit/docs/getting-started.html
 class MySuite extends munit.FunSuite {
-  test("Trumpify Deck Test") { 
-    val TrumpSuit = "Clubs"
-    val pDeck = CreateDeck()
-    pDeck.Trumpify(TrumpSuit)
-    val obtained = pDeck.getTrumpSuit()
-    val expected = "Clubs"
-    assertEquals(obtained, expected)
-  }
-  test("Trumpify Value Test") {
-    val TrumpSuit = "Spades"
-    val pDeck = CreateDeck()
-    pDeck.Trumpify(TrumpSuit)
-    val obtained = pDeck.cards.head.getValue()
-    val expected = 22
-    assertEquals(obtained, expected)
-  }
   test("Eaven Split Test (52 Cards)") {
-    val pDeck = CreateDeck().Split()
-    val p1 = pDeck._1.length
-    val p2 = pDeck._2.length
-    assertEquals(p1, p2)
-  }
-  test("Uneaven Split Test (39 Cards)") {
-    val pDeck = CreateDeck(CardPartsTest.suits).Split()
-    val p1 = pDeck._1.length
-    val p2 = pDeck._2.length
-    assertNotEquals(p1, p2)
-  }
-  test("PlayWar with eaven ammounts of cards") {
-    val pDeck = CreateDeck().Shuffle().Split()
+    val pDeck = createDeck().split()
     val p1 = pDeck._1
     val p2 = pDeck._2
-    val result = PlayWar(p1, p2)
-    assertEquals(result.isRight, true)
+    assertEquals(checkHandEquality(p1, p2), EqualHands("Player hands are equal"))
   }
-  test("PlayWar with uneaven ammounts of cards") {
-    val pDeck = CreateDeck(CardPartsTest.suits).Shuffle().Split()
+  test("Uneaven Split Test (51 Cards)") {
+    val pDeck = createDeck().split()
+    val p1 = pDeck._1.drop(1)
+    val p2 = pDeck._2
+    assertEquals(checkHandEquality(p1, p2), UneaqualHands("Player hands are not equal"))
+  }
+  test("playWar with eaven ammounts of cards") {
+    val pDeck = createDeck().split()
     val p1 = pDeck._1
     val p2 = pDeck._2
-    val result = PlayWar(p1, p2)
-    assertEquals(result.isLeft, true)
+    val gameresult = playWar(p1, p2, Suit.Clubs)
+    //When cards are not shuffled only these results are achieved
+    val result = gameresult._1.length == 13 && gameresult._2.length == 39
+    assertEquals(result, true)
+  }
+  test("playWar with uneaven ammounts of cards") {
+    val pDeck = createDeck().split()
+    val p1 = pDeck._1
+    val p2 = pDeck._2.drop(1)
+    val gameresult = playWar(p1, p2, Suit.Clubs)
+    //When cards are not shuffled only these results are achieved
+    val result = gameresult._1.length == 2 && gameresult._2.length == 48
+    assertEquals(result, true)
   }
   test("CheckDeck when Deck has appropriate cards") {
-    val result = CheckDeck(CreateDeck().cards)
+    val result = checkDeck(createDeck().cards)
     assertEquals(result, ValidDeck("Deck created succesfully!"))
   }
 
   test("CheckDeck when there are < 2 cards") {
-    val result = CheckDeck(CreateDeck(CardPartsTest2.suits, CardPartsTest2.ranks).cards)
+    val pDeck = List(createDeck().cards.last)
+    val result = checkDeck(pDeck)
     assertEquals(result, InvalidDeck("Deck has an improper number of cards or contains duplicates"))
   }
 
   test("CheckDeck when there are duplicates") {
-    val result = CheckDeck(CreateDeck(CardPartsTest3.suits, CardPartsTest3.ranks).cards)
+    val pDeck = List(createDeck().cards.last, createDeck().cards.last)
+    val result = checkDeck(pDeck)
     assertEquals(result, InvalidDeck("Deck has an improper number of cards or contains duplicates"))
   }
 }

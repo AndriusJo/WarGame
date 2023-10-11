@@ -1,36 +1,24 @@
 import scala.compiletime.ops.int
 import scala.util._
 import scala.collection.mutable.Queue
+
 @main def War: Unit = {
-  val FullDeck = CreateDeck().Shuffle()
+  val fullDeck = createDeck().shuffle()
+
+  //Get a random trump suit and update the deck with it
+  val trumpSuit = Suit.fromOrdinal(Random.nextInt(Suit.values.length))
   
-  CheckDeck(FullDeck.cards) match {
-    case ValidDeck(message) => {
-      println(message)
+  //Split the deck in the middle, half for each player
+  val splitDeck = fullDeck.split()
+  val playerHands:(List[Card], List[Card])= (splitDeck._1, splitDeck._2)
 
-      //Get a random trump suit and update the deck with it
-      val TrumpSuit = CardParts.suits(Random.nextInt(CardParts.suits.length))
-      FullDeck.Trumpify(TrumpSuit)
+  //Play the game
+  val gameResults = playWar(playerHands._1, playerHands._2, trumpSuit)
 
-      //Split the deck in the middle, half for each player
-      val SplitDeck = FullDeck.Split()
-      val PlayerHands:(List[Card], List[Card])= (SplitDeck._1, SplitDeck._2)
-      
-      //Play the game
-      val GameResults = PlayWar(PlayerHands._1, PlayerHands._2)
-      GameResults match {
-        case Right(results) => {
-          //You can comment this function if you do not want the result output in the console
-          PrintOutputs(PlayerHands, results)
+  //You can comment this function if you do not want the result output in the console
+  printOutputs(playerHands, gameResults, trumpSuit)
 
-          //Create a structure to hold the Result data
-          val FinalResults = (("Player 1", results._1.length, results._1),
-                              ("Player 2", results._2.length, results._2))
-        }
-        case Left(message) => println(message)
-      }
-    }
-    case InvalidDeck(error) => println(error)
-    case _ => println("Error in Deck")
-  }
+  //Create a structure to hold the Result data
+  val finalResults = (("Player 1", gameResults._1),
+                      ("Player 2", gameResults._2))
 }

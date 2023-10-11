@@ -1,22 +1,25 @@
 import scala.compiletime.ops.int
 import scala.util._
 
-object CardParts {
-  val suits = List("Spades", "Hearts", "Diamonds", "Clubs")
-  val ranks = List(("Two", 2) ,("Three", 3),("Four", 4),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
+enum Suit{
+  type Suit
+  case Spades, Hearts, Clubs, Diamonds
 }
 
-object CardPartsTest {
-  val suits = List("Spades", "Hearts", "Diamonds")
-  val ranks = List(("Two", 2) ,("Three", 3),("Four", 4),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
-}
-
-object CardPartsTest2 {
-  val suits = List("Spades")
-  val ranks = List(("Two", 2))
-}
-
-object CardPartsTest3 {
-  val suits = List("Spades", "Hearts", "Diamonds", "Clubs")
-  val ranks = List(("Two", 2) ,("Two", 2),("Two", 2),("Five", 5),("Six", 6),("Seven", 7),("Eight", 8),("Nine", 9),("Ten", 10),("Jack", 11),("Queen", 12),("King", 13),("Ace", 14))
+enum Rank(number: Int){
+  type Rank
+  val value = number
+  case Two extends Rank(2)
+  case Three extends Rank(3)
+  case Four extends Rank(4)
+  case Five extends Rank(5)
+  case Six extends Rank(6)
+  case Seven extends Rank(7)
+  case Eight extends Rank(8)
+  case Nine extends Rank(9)
+  case Ten extends Rank(10)
+  case Jack extends Rank(11)
+  case Queen extends Rank(12)
+  case King extends Rank(13)
+  case Ace extends Rank(14)
 }
